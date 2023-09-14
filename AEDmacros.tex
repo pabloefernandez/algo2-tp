@@ -125,19 +125,18 @@
 \newcommand{\oLuego}{\lor _L}
 \newcommand{\implicaLuego}{\implica _L}
 
+
+
 \newcommand{\cuantificador}[5]{%
-	\ensuremath{(#2 #3: #4)\ (%
-		\ifthenelse{\equal{#1}{unalinea}}{
-			#5
-		}{
-			$ % exiting math mode
-			\begin{adjustwidth}{+2em}{}
-				$#5$%
-			\end{adjustwidth}%
-			$ % entering math mode
-		}
-		)}
+	\ensuremath{\ifthenelse{\equal{#1}{unalinea}}{%
+		(#2#3 : #4) \;(#5) % Sin ajuste de margen
+	}{%
+		$ % exiting math mode
+		(#2#3 : #4) \;(#5) % Con ajuste de margen
+		$ % entering math mode
+	}}%
 }
+
 
 \newcommand{\existe}[4][]{%
 	\cuantificador{#1}{\exists}{#2}{#3}{#4}

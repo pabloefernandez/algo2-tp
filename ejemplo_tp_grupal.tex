@@ -25,124 +25,259 @@
 \begin{document}
 
 \maketitle
+\section{Especificacion}
+\subsection{Ejercicio 1}
 
-\section{Ejemplo de sección}
-\subsection{Subsección: ambientes comunes de \LaTeX}
+\begin{proc}{hayBallotage}{\In escrutinio : \TLista{\ent}}{Bool}
+	%    \modifica{parametro1, parametro2,..}
+	\requiere{esEscrutinioValido(escrutinio)}
+	\asegura{res = \True \Iff (\neg algunoSupera45(escrutinio) \wedge \neg algunoSupera40y10(escrutinio))} 
+    
+    \vspace{5mm} 
+	\pred{esEscrutinioValido}{escrutinio : \TLista{\ent}}{
+    (|escrutinio| \geq 3) \ \wedge \ \paraTodo{i}{\ent}{0\leq i < |escrutinio| \implicaLuego \\ \paraTodo{j}{\ent}{(0\leq j < |escrutinio| \wedge i \neq j) \implicaLuego escrutinio[i] \neq escrutinio[j]}}
+    }
+    
+    \vspace{5mm} 
+    \aux{sumaTotalDeVotos}{escrutinio:\TLista{\ent}}{\ent}{\sum_{i=0}^{|escrutinio|-1}{escrutinio[i]}
+    }
+    
+    \vspace{5mm} 
+    \aux{porcentajeVotos}{escrutinio : \TLista{\ent},i:\ent}{\ent}{\frac{escrutinio[i]}{sumaTotalDeVotos(escrutinio)}
+    }
+    
+    \vspace{5mm}     
+    \pred{algunoSupera45}{escrutinio : \TLista{\ent}}{\existe{i}{\ent}{0\leq i < (|escrutinio|-1) \yLuego porcentajeVotos(escrutinio,i) \geq 0,45}
+    }
+    
+    \vspace{5mm}     
+    \pred{algunoSupera40y10}{escrutinio : \TLista{\ent}}{\existe{i}{\ent}{0\leq i < (|escrutinio|-1) \ \yLuego \ (porcentajeVotos(escrutinio,i) \geq 0,4 \ \wedge \\ \paraTodo{j}{\ent}{(0\leq j < (|escrutinio| - 1) \ \wedge \ i \neq j) \implicaLuego porcentajeVotos(escrutinio,j) < \\ (porcentajeVotos(escrutinio,i)-0,1)})}
+    } 
+    
+\end{proc}
 
-Lo principal: las fórmulas. Se puede poner en una linea, como $x_i = x_{i-1} + x_{i-2}$, o ponerse más grande:
+\subsection{Ejercicio 2}
 
-\begin{equation}
-	\sum\limits_{i=0}^{n} i
-	\label{eq:1}
-\end{equation}
+\begin{proc}{hayFraude}{\In escrutinio\_presidencial : \TLista{\ent},\In escrutinio\_senadores : \TLista{\ent},\In escrutinio\_diputados : \TLista{\ent}}{Bool}
 
-Y se pueden citar ecuaciones con \verb|\eqref{nombreDeEq}|: \eqref{eq:1}
+\requiere{esEscrutinioValido(escrutinio\_presidencial) \ \wedge \ esEscrutinioValido(escrutinio\_senadores) \ \wedge \ esEscrutinioValido(escrutinio\_diputados)}
 
-Ejemplo de itemizado:
+\asegura{res = \False \Iff noHayFraude(escrutinio\_presidencial,escrutinio\_senadores,escrutinio\_diputados)}
 
-\begin{itemize}
-	\item Item 1
-	\item Item 2
-	\item Item 3
-\end{itemize}
+\vspace{5mm}     
+\pred{noHayFraude}{escrutinio\_presidencial : \TLista{\ent},escrutinio\_senadores : \TLista{\ent},escrutinio\_diputados : \TLista{\ent}}{(sumaTotalDeVotos(escrutinio\_presidencial) = sumaTotalDeVotos(escrutinio\_senadores)) \ \wedge \\ (sumaTotalDeVotos(escrutinio\_presidencial) = sumaTotalDeVotos(escrutinio\_diputados))
+}
 
-Ejemplo de enumerado con menor distancia entre items:
+\end{proc}
 
-\begin{enumerate} \setlength\itemsep{0cm}
-	\item Item 1
-	\item Item 2
-	\item Item 3
-\end{enumerate}
+\subsection{Ejercicio 3}
 
-Podemos escribir mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto. Mucho texto.
+\begin{proc}{obtenerSenadoresEnProvincia}{\In escrutinio: \TLista{\ent}}{\ent \times \ent}
 
-Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo. Otro párrafo.
+\requiere{esEscrutinioValido(escrutinio)}
+\asegura{\existe{i}{\ent}{(0\leq i < (|escrutinio|-1) \yLuego esListaMasVotada(escrutinio,i)) \Iff res_{0}=i} \wedge \\ \existe{j}{\ent}{0\leq j < (|escrutinio|-1) \yLuego esSegundaMasVotada(escrutinio,j) \Iff res_{1}=j}}
 
-\vspace{0.3cm}
+\vspace{5mm} 
+\pred{esListaMasVotada}{escrutinio: \TLista{\ent}, i:\ent}{\paraTodo{j}{\ent}{(0\leq j<|escrutinio|-1 \wedge i \neq j) \implicaLuego escrutinio[i]>escrutinio[j]}}
 
-Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos. Le agregamos una separación entre párrafos.
+\vspace{5mm} 
+\pred{esSegundaMasVotada}{escrutinio: \TLista{\ent}, i:\ent}{(\neg esListaMasVotada(escrutinio,i)) \wedge \paraTodo{j}{\ent}{(0\leq j<|escrutinio|-1 \yLuego \neg esListaMasVotada(escrutinio,j) \wedge i \neq j) \implicaLuego escrutinio[i]>escrutinio[j]}}
 
-\vspace{0.3cm}
+\end{proc}
 
-La tabla \ref{tab:ejemplo} es un ejemplo de cómo se hace una tabla.
+\subsection{Ejercicio 4}
 
-\begin{table}[h!]
-	\centering
-	\begin{tabular}{||l c c r||} 
-		\hline
-		Col1 & Col2 & Col2 & Col3 \\ [0.5ex] 
-		\hline\hline
-		1 & 6 & 87837 & 787 \\ 
-		2 & 7 & 78 & 5415 \\
-		3 & 545 & 778 & 7507 \\
-		4 & 545 & 18744 & 7560 \\
-		5 & 88 & 788 & 6344 \\
-		\hline
-	\end{tabular}
-	\caption{Ejemplo de tabla}
-	\label{tab:ejemplo}
-\end{table}
+\begin{proc}{calcularDHontEnProvincia}{\In cant\_bancas : \ent, \In escrutinio : \TLista{\ent}}{\TLista{\TLista{\ent}}}
 
+\requiere{\existe{i}{\ent}{0\leq i < |escrutinio| \yLuego SuperaElUmbral(escrutinio,i)} \ \wedge \ esEscrutinioValido(escrutinio) \ \wedge \ cant\_bancas > 0 }
 
-La figura \ref{fig:subfigs} es un ejemplo de cómo se agrega una imagen.
+\asegura{ |res| = (|escrutinio| - 1) \ \wedge \ \paraTodo{i}{\ent}{0 \leq i < |res| - 1 \implicaLuego res[i] \leq cant\_bancas \ \wedge \ res[i] = res[i+1]} \ \wedge \\ \paraTodo{j}{\ent}{0 \leq j < |res| \implicaLuego res[i][0] = escrutinio[i]} \ \wedge \\ \paraTodo{k}{\ent}{0 \leq k < |res| \implicaLuego esFilaDHont(res[k])}}
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=0.6\textwidth]{logo_dc.jpg}
-	\caption{Ejemplo de figura}
-	\label{fig:ejemplo}
-\end{figure}
+\vspace{5mm} 
+\pred{esFilaDHont}{fila : \TLista{\ent}}{\paraTodo{j}{\ent}{1 \leq j < |fila| \implicaLuego fila[j] = \frac{fila[0]}{i+1}}
+}
+    
+\end{proc}
 
-\begin{figure}[ht!]
-	\begin{subfigure}{0.5\textwidth}
-		\includegraphics[width=0.9\linewidth]{LaTeX-project} 
-		\caption{Logo de LaTeX}
-		\label{fig:subfig1}
-	\end{subfigure}
-	\begin{subfigure}{0.5\textwidth}
-		\includegraphics[width=0.7\linewidth]{TeX}
-		\caption{Logo de TeX}
-		\label{fig:subfig2}
-	\end{subfigure}
-	\caption{Ejemplo para poner dos figuras juntas. Y citarlas por separado a (\subref{fig:subfig1}) y (\subref{fig:subfig2}).}
-	% OJO: el caption siempre va antes del label
-	\label{fig:subfigs}
-\end{figure}
+\subsection{Ejercicio 5}
+\begin{proc}{obtenerDiputadosEnProvincia}{\In cant\_bancas : \ent, \In escrutinio : \TLista{\ent}, \In dHondt:\matriz{\ent}}{\TLista{\ent}}
 
+\requiere{cant\_bancas > 0 \ \wedge \ esEscrutinioValido(escrutinio) \\ \wedge esMatrizDHondtValida(dHondt,cant\_bancas,escrutinio)}
 
+\asegura{sumaDeBancas(res)=cant\_bancas \wedge escañosAsignadosCorrectos(dHondt,res) \\ \wedge \paraTodo{i}{\ent}{(0\leq i<|res|) \implicaLuego (res[i]>0 \Iff superaUmbral(escrutinio)) \ \wedge \paraTodo{i}{\ent}{(0\leq i<|res|) \implicaLuego res[i]>0}}}
 
-% Para hacer que quede todo en una misma linea, se puede usar minipage
-%\begin{minipage}[t]{\textwidth}
-	\begin{lstlisting}[caption={Ejemplo de código (usando los estilos de la cátedra, ver las macros para más detalles)},label=code:for]
-res := 0;
+\vspace{5mm} 
+\aux{sumaDeBancas}{res:\TLista{\ent}}{\ent}{\sum_{i=0}^{|res|-1}{res[i]}}
+
+\vspace{5mm} 
+\pred{escañosAsignadosCorrectos}{dHondt:\matriz{\ent},bancasAsignadas:\TLista{\ent}}{\paraTodo{i}{\ent}{(0\leq i<|bancasAsignadas| \ \wedge \ bancasAsignadas[i]>0) \implicaLuego \\ \paraTodo{j}{\ent}{(0\leq j<|bancasAsignadas| \ \wedge \ i \neq j \ \wedge superaElUmbral(escrutinio,j)) \implicaLuego \\ dHondt[i][bancasAsignadas[i]-1] > dHondt[j][bancasAsignadas[j]] }}}
+
+\vspace{5mm}
+\pred{esMatrizDHontValida}{dHont : \matriz{\ent}, cant\_bancas : \ent, escrutinio : \TLista{\ent}}{|dHont| = (|escrutinio| - 1) \ \wedge \ \paraTodo{i}{\ent}{0 \leq i < |dHont| - 1 \implicaLuego dHont[i] \leq cant\_bancas \ \wedge \ dHont[i] = dHont[i+1]} \\ \wedge \ \paraTodo{j}{\ent}{0 \leq j < |dHont| \implicaLuego dHont[i][0] = escrutinio[i]} \ \wedge \\ \paraTodo{k}{\ent}{0 \leq k < |dHont| \implicaLuego esFilaDHont(dHont[k])}}
+
+\end{proc}
+
+\subsection{Ejercicio 6}
+
+\begin{proc}{validarListasDiputadosEnProvincias}{\In cant\_bancas : \ent , \In listas : \TLista{\TLista{dni : ent \times genero : \ent}}}{Bool}
+
+\requiere{ cant\_bancas > 0 \ \wedge \ \paraTodo{i}{\ent}{0 \leq i < |listas| \implicaLuego \\ \paraTodo{j}{\ent}{0 \leq j < |listas[i] \implicaLuego (0 \leq listas[i][j]_1 \leq 1 \ \wedge \ 1.000.000 \leq listas[i][j]_0 \leq 99.999.999)}}}
+
+\asegura{ res = True \Iff alternanGenero(listas) \ \wedge \ presentanCantidadCorrecta(listas, cant\_bancas)}
+
+\vspace{5mm}
+\pred{alternanGenero}{listas : \TLista{\TLista{dni : ent \times genero : \ent}}}{\paraTodo{i}{\ent}{0 \leq i < |listas| \implicaLuego \\ \paraTodo{j}{\ent}{0 \leq j < (|listas[i]| - 1) \ \implicaLuego \ listas[i][j]_1 \neq listas[i][j+1]_1}}}
+
+\vspace{5mm}
+\pred{presentanCantidadCorrecta}{listas : \TLista{\TLista{dni : ent \times genero : \ent}}, cant\_bancas : \ent}{ \paraTodo{i}{\ent}{0 \leq i < |listas| \implicaLuego |listas[i]| = cant\_bancas}}
+
+\end{proc}
+
+\section{Implementaciones y demostraciones de correctitud}
+\subsection{Algoritmos de problemas}
+\subsubsection{hayBallotage}
+
+\subsubsection{hayFraude}
+
+\begin{lstlisting}[caption={},label=code:for]
+suma_presidencial := 0;
+suma_diputados := 0;
+suma_senadores := 0;
 i := 0;
-while (i < s.size()) do
-	res := res + s[i];
-	i := i + 1
+
+while (i < escrutinio_presidencial.size()) do
+    suma_presidencial := suma_presidencial + escrutinio_presidencial[i];
+    suma_diputados := suma_diputados + escrutinio_diputados[i];
+    suma_senadores := suma_senadores + escrutinio_senadores[i];
+    i := i + 1;
 endwhile
+
+res := (suma_presidencial != suma_diputados) or (suma_presidencial != suma_senadores)
 	\end{lstlisting}
 %\end{minipage}
 
-Si se pone un label al \verb|lstlisting|, se puede referenciar: Código \ref{code:for}.
+
+\subsubsection{obtenerSenadoresEnProvincia}
+
+\subsubsection{validarListasDiputadosEnProvincia}
+
+\subsection{Demostracion de correctitud}
+
+\subsubsection{hayFraude}
+
+Separamos el programa en tres partes, siendo:
+
+\vspace{5mm}
+\begin{itemize}
+    \item S1 = 
+\begin{lstlisting}[caption={},label=code:for]
+suma_presidencial := 0;
+suma_diputados := 0;
+suma_senadores := 0;
+i := 0;
+    \end{lstlisting}
+\vspace{5mm}
+\item S2 = 
+\begin{lstlisting}[caption={},label=code:for]
+while (i < escrutinio_presidencial.size()) do
+    suma_presidencial := suma_presidencial + escrutinio_presidencial[i];
+    suma_diputados := suma_diputados + escrutinio_diputados[i];
+    suma_senadores := suma_senadores + escrutinio_senadores[i];
+    i := i + 1;
+endwhile
+    \end{lstlisting}
+\vspace{5mm}
+\item S3 = 
+\begin{lstlisting}[caption={},label=code:for]
+res := (suma_presidencial != suma_diputados) or (suma_presidencial != suma_senadores)
+    \end{lstlisting}
+\vspace{5mm}
+\end{itemize}
 
 
-\subsection{Macros de la cátedra para especificar}
+Luego para la correccion del programa, basta con demostrar:
 
-\begin{proc}{nombre}{\In paramIn : \nat, \Inout paramInout : \TLista{\ent}}{tipoRes}
-	%    \modifica{parametro1, parametro2,..}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
-	\aux{auxiliar1}{parametros}{tipoRes}{expresion}
-	\pred{pred1}{parametros}{expresion} 
-\end{proc}
-
-\aux{auxiliarSuelto}{parametros}{tipoRes}{expresion}
-% \paraTodo{variable}{tipo}{expresion}
-% \existe{variable}{tipo}{expresion}
-% Pueden tener [unalinea] para que no se divida en varias lineas
-\pred{predSuelto}{parametros}{\paraTodo[unalinea]{variable}{tipo}{algo \implicaLuego expresion}}
-\pred{predSuelto}{parametros}{\existe[unalinea]{variable}{tipo}{algo \yLuego expresion}}
+\begin{enumerate}
+\item Pre $\implicaLuego$ wp(S1,Pc)
+\item Pc $\implicaLuego$ wp(S2,Qc)
+\item Qc $\implicaLuego$ wp(S3,Post)
+\end{enumerate}
 
 
+Siendo:
+
+\begin{itemize}
+    \item Pc $\equiv$ suma\_presidencial = 0 $\land$ suma\_diputados = 0 $\land$ suma\_senadores = 0 $\land$ i = 0
+    \item Qc $\equiv$ i = $\abs{escrutinio\_presidencial}$ \ $\land$ \ suma\_presidencial = \sum_{i=0}^{|escrutinio\_presidencial|-1}{escrutinio\_presidencial[i]} \\ $\land$ \ suma\_diputados = \sum_{i=0}^{|escrutinio\_diputados|-1}{escrutinio\_diputados[i]} \\ $\land$ \ suma\_senadores = \sum_{i=0}^{|escrutinio\_senadores|-1}{escrutinio\_senadores[i]}
+\end{itemize} 
+
+\vspace{5mm}
+\begin{enumerate}
+
+    \item \begin{itemize}
+        \item Calculamos wp(S1,Pc): \\
+        
+        wp(S1,Pc) $\equiv$ wp(suma\_presidencial := 0; suma\_diputados := 0; suma\_senadores := 0; i := 0, suma\_presidencial = 0 $\land$ suma\_diputados = 0 $\land$ suma\_senadores = 0 $\land$ i = 0) \\ 
+        
+        $\equiv$ wp(suma\_presidencial := 0, wp(suma\_diputados := 0, wp(suma\_senadores := 0, wp(i := 0, suma\_presidencial = 0 $\land$ suma\_diputados = 0 $\land$ suma\_senadores = 0 $\land$ i = 0) \\
+
+        $\equiv$ wp(suma\_presidencial := 0, wp(suma\_diputados := 0, wp(suma\_senadores := 0, suma\_presidencial = 0 $\land$ suma\_diputados = 0 $\land$ suma\_senadores = 0 $\land$ 0 = 0) \\
+        
+        $\equiv$ wp(suma\_presidencial := 0, wp(suma\_diputados := 0,  suma\_presidencial = 0 $\land$ suma\_diputados = 0 $\land$ 0 = 0 $\land$ 0 = 0) \\
+        
+        $\equiv$ wp(suma\_presidencial := 0,   suma\_presidencial = 0 $\land$ 0 = 0 $\land$ 0 = 0 $\land$ 0 = 0) \\
+        
+        $\equiv$ (0 = 0 $\land$ 0 = 0 $\land$ 0 = 0 $\land$ 0 = 0) 
+        $\equiv$ (True $\land$ True $\land$ True $\land$ True) 
+        $\equiv$ (True)
+    
+        \vspace{5mm}
+        \item Pre $\implicaLuego$ True $\equiv$ True
+        
+    \end{itemize}
+
+    \item \begin{itemize}
+        \item Calculamos wp(S2,Qc): \\
+
+        wp(S2,Qc) $\equiv$ 
+        
+    \end{itemize}
+
+    
+
+    \item \begin{itemize}
+        \item Calculamos wp(S3,Post):
+
+        \vspace{5mm}
+        wp(S3,Post) $\equiv$ wp(res := (suma presidencial != suma diputados) or (suma presidencial != suma senadores), \\ res = $\False$ \ \Iff \ noHayFraude Tru(escrutinio\_presidencial, escrutinio\_senadores, escrutinio\_diputados) ) \\
+
+        $\equiv$ (suma\_presidencial != suma\_diputados) or (suma\_presidencial != suma\_senadores) = $\False$ \ \Iff \ noHayFraude(escrutinio\_presidencial, escrutinio\_senadores, escrutinio\_diputados) \\
+
+        (aplicamos la propiedad: p = q $\Iff$ $\neg$p = $\neg$q)
+        
+        $\equiv$ (suma\_presidencial = suma\_diputados) and (suma\_presidencial = suma\_senadores) = $\True$ \ \Iff \ noHayFraude(escrutinio\_presidencial, escrutinio\_senadores, escrutinio\_diputados) \\
+
+        (reemplazo sintáctico en noHayFraude)
+
+        $\equiv$ (suma\_presidencial = suma\_diputados) and (suma\_presidencial = suma\_senadores) = $\True$ \ \Iff \\ (sumaTotalDeVotos(escrutinio\_presidencial) = sumaTotalDeVotos(escrutinio\_senadores)) \ \wedge \\ (sumaTotalDeVotos(escrutinio\_presidencial) = sumaTotalDeVotos(escrutinio\_diputados)) \\
+
+        (reemplazo sintáctico en sumaTotalDeVotos)
+
+        $\equiv$ (suma\_presidencial = suma\_diputados) and (suma\_presidencial = suma\_senadores) \ = $\True$ \ $\Iff$ \\ $\sum$_{i=0}^{|escrutinio\_presidencial|-1}{escrutinio\_presidencial[i]} = $\sum$_{i=0}^{|escrutinio\_senadores|-1}{escrutinio\_senadores[i]} \ $\wedge$ \\ $\sum$_{i=0}^{|escrutinio\_presidencial|-1}{escrutinio\_presidencial[i]} = $\sum$_{i=0}^{|escrutinio\_diputados|-1}{escrutinio\_diputados[i]} \\
+
+        (se puede ver que ambos lados del $\Iff$ se implican trivialmente)
+
+        $\equiv$ True \\
+
+        \item Qc $\implicaLuego$ wp(S3,Post) $\equiv$ Qc $\implicaLuego$ True $\equiv$ True
+        
+    \end{itemize}
+    
+\end{enumerate}
+
+
+
+
+\subsubsection{obtenerSenadoresEnProvincia}
 
 \end{document}
